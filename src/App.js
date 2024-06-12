@@ -13,6 +13,7 @@
 // // export default App;
 
 
+
 import React, { useState, useEffect, useRef } from 'react';
 
 const TextEditor = () => {
@@ -21,7 +22,7 @@ const TextEditor = () => {
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
   const textRef = useRef();
 
-  const handleMouseUp = (event) => {
+  const handleMouseUp = () => {
     const selection = window.getSelection();
     if (selection.toString().length > 0) {
       const range = selection.getRangeAt(0);
@@ -42,15 +43,81 @@ const TextEditor = () => {
     };
   }, []);
 
-  const applyFormatting = (command, value = null) => {
+  const applyStyle = (style) => {
+    if (selectionRange) {
+      const span = document.createElement('span');
+      span.style.cssText = style;
+
+      try {
+        selectionRange.surroundContents(span);
+      } catch (e) {
+        const fragment = selectionRange.extractContents();
+        span.appendChild(fragment);
+        selectionRange.insertNode(span);
+      }
+
+      setSelectionRange(null);
+      setShowToolbar(false);
+    }
+  };
+
+  const applyAlignment = (alignment) => {
+    if (selectionRange) {
+      const div = document.createElement('div');
+      div.style.textAlign = alignment;
+      div.style.display = 'block';
+
+      try {
+        selectionRange.surroundContents(div);
+      } catch (e) {
+        const fragment = selectionRange.extractContents();
+        div.appendChild(fragment);
+        selectionRange.insertNode(div);
+      }
+
+      setSelectionRange(null);
+      setShowToolbar(false);
+    }
+  };
+
+  const copyToClipboard = async () => {
     if (selectionRange) {
       const selection = window.getSelection();
       selection.removeAllRanges();
       selection.addRange(selectionRange);
 
-      document.execCommand(command, false, value);
+      try {
+        await navigator.clipboard.writeText(selection.toString());
+        alert('Text copied to clipboard');
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+      }
+
       setSelectionRange(null);
       setShowToolbar(false);
+    }
+  };
+
+  const pasteFromClipboard = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (selectionRange) {
+        const range = selectionRange;
+        range.deleteContents();
+        const textNode = document.createTextNode(text);
+        range.insertNode(textNode);
+
+        // Move cursor to the end of the inserted text
+        const newRange = document.createRange();
+        newRange.setStartAfter(textNode);
+        newRange.collapse(true);
+
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+      }
+    } catch (err) {
+      console.error('Failed to read clipboard contents: ', err);
     }
   };
 
@@ -82,7 +149,7 @@ const TextEditor = () => {
           }}
         >
           <button
-            onClick={() => applyFormatting('bold')}
+            onClick={() => applyStyle('font-weight: bold;')}
             style={{
               backgroundColor: '#f0f0f0',
               border: 'none',
@@ -93,7 +160,7 @@ const TextEditor = () => {
             Bold
           </button>
           <button
-            onClick={() => applyFormatting('underline')}
+            onClick={() => applyStyle('text-decoration: underline;')}
             style={{
               backgroundColor: '#f0f0f0',
               border: 'none',
@@ -104,7 +171,7 @@ const TextEditor = () => {
             Underline
           </button>
           <button
-            onClick={() => applyFormatting('justifyLeft')}
+            onClick={() => applyAlignment('left')}
             style={{
               backgroundColor: '#f0f0f0',
               border: 'none',
@@ -115,7 +182,7 @@ const TextEditor = () => {
             Left
           </button>
           <button
-            onClick={() => applyFormatting('justifyCenter')}
+            onClick={() => applyAlignment('center')}
             style={{
               backgroundColor: '#f0f0f0',
               border: 'none',
@@ -126,7 +193,7 @@ const TextEditor = () => {
             Center
           </button>
           <button
-            onClick={() => applyFormatting('justifyRight')}
+            onClick={() => applyAlignment('right')}
             style={{
               backgroundColor: '#f0f0f0',
               border: 'none',
@@ -137,7 +204,7 @@ const TextEditor = () => {
             Right
           </button>
           <button
-            onClick={() => applyFormatting('justifyFull')}
+            onClick={() => applyAlignment('justify')}
             style={{
               backgroundColor: '#f0f0f0',
               border: 'none',
@@ -147,6 +214,28 @@ const TextEditor = () => {
           >
             Justify
           </button>
+          <button
+            onClick={copyToClipboard}
+            style={{
+              backgroundColor: '#f0f0f0',
+              border: 'none',
+              padding: '5px 10px',
+              cursor: 'pointer',
+            }}
+          >
+            Copy
+          </button>
+          <button
+            onClick={pasteFromClipboard}
+            style={{
+              backgroundColor: '#f0f0f0',
+              border: 'none',
+              padding: '5px 10px',
+              cursor: 'pointer',
+            }}
+          >
+            Paste
+          </button>
         </div>
       )}
     </div>
@@ -154,4 +243,3 @@ const TextEditor = () => {
 };
 
 export default TextEditor;
-
