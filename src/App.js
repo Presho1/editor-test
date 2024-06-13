@@ -37,10 +37,10 @@ const TextEditor = () => {
   };
 
   useEffect(() => {
-    document.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
+    // document.addEventListener('mouseup', handleMouseUp);
+    // return () => {
+    //   document.removeEventListener('mouseup', handleMouseUp);
+    // };
   }, []);
 
   const applyStyle = (style) => {
