@@ -123,19 +123,8 @@ const TextEditor = () => {
 
   return (
     <div style={{ padding: '50px' }}>
-      <div
-        ref={textRef}
-        contentEditable
-        style={{
-          border: '1px solid #ccc',
-          padding: '10px',
-          minHeight: '200px',
-          outline: 'none',
-        }}
-      >
-        Select text in this editable area to see formatting options.
-      </div>
-      {showToolbar && (
+
+{/* {showToolbar && ( */}
         <div
           style={{
             position: 'absolute',
@@ -237,7 +226,19 @@ const TextEditor = () => {
             Paste
           </button>
         </div>
-      )}
+      {/* )} */}
+      <div
+        ref={textRef}
+        contentEditable
+        style={{
+          border: '1px solid #ccc',
+          padding: '10px',
+          minHeight: '200px',
+          outline: 'none',
+        }}
+      >
+        Select text in this editable area to see formatting options.
+      </div>
     </div>
   );
 };
