@@ -18,8 +18,6 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const TextEditor = () => {
   const [selectionRange, setSelectionRange] = useState(null);
-  const [showToolbar, setShowToolbar] = useState(false);
-  const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
   const textRef = useRef();
 
   const handleMouseUp = () => {
@@ -27,20 +25,14 @@ const TextEditor = () => {
     if (selection.toString().length > 0) {
       const range = selection.getRangeAt(0);
       setSelectionRange(range);
-
-      const rect = range.getBoundingClientRect();
-      setToolbarPosition({ top: rect.top - 40 + window.scrollY, left: rect.left + window.scrollX });
-      setShowToolbar(true);
-    } else {
-      setShowToolbar(false);
     }
   };
 
   useEffect(() => {
-    // document.addEventListener('mouseup', handleMouseUp);
-    // return () => {
-    //   document.removeEventListener('mouseup', handleMouseUp);
-    // };
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
   }, []);
 
   const applyStyle = (style) => {
@@ -57,7 +49,6 @@ const TextEditor = () => {
       }
 
       setSelectionRange(null);
-      setShowToolbar(false);
     }
   };
 
@@ -76,7 +67,6 @@ const TextEditor = () => {
       }
 
       setSelectionRange(null);
-      setShowToolbar(false);
     }
   };
 
@@ -94,7 +84,6 @@ const TextEditor = () => {
       }
 
       setSelectionRange(null);
-      setShowToolbar(false);
     }
   };
 
@@ -123,110 +112,6 @@ const TextEditor = () => {
 
   return (
     <div style={{ padding: '50px' }}>
-
-{/* {showToolbar && ( */}
-        <div
-          style={{
-            position: 'absolute',
-            top: toolbarPosition.top,
-            left: toolbarPosition.left,
-            backgroundColor: 'white',
-            border: '1px solid #ccc',
-            padding: '5px',
-            display: 'flex',
-            gap: '5px',
-          }}
-        >
-          <button
-            onClick={() => applyStyle('font-weight: bold;')}
-            style={{
-              backgroundColor: '#f0f0f0',
-              border: 'none',
-              padding: '5px 10px',
-              cursor: 'pointer',
-            }}
-          >
-            Bold
-          </button>
-          <button
-            onClick={() => applyStyle('text-decoration: underline;')}
-            style={{
-              backgroundColor: '#f0f0f0',
-              border: 'none',
-              padding: '5px 10px',
-              cursor: 'pointer',
-            }}
-          >
-            Underline
-          </button>
-          <button
-            onClick={() => applyAlignment('left')}
-            style={{
-              backgroundColor: '#f0f0f0',
-              border: 'none',
-              padding: '5px 10px',
-              cursor: 'pointer',
-            }}
-          >
-            Left
-          </button>
-          <button
-            onClick={() => applyAlignment('center')}
-            style={{
-              backgroundColor: '#f0f0f0',
-              border: 'none',
-              padding: '5px 10px',
-              cursor: 'pointer',
-            }}
-          >
-            Center
-          </button>
-          <button
-            onClick={() => applyAlignment('right')}
-            style={{
-              backgroundColor: '#f0f0f0',
-              border: 'none',
-              padding: '5px 10px',
-              cursor: 'pointer',
-            }}
-          >
-            Right
-          </button>
-          <button
-            onClick={() => applyAlignment('justify')}
-            style={{
-              backgroundColor: '#f0f0f0',
-              border: 'none',
-              padding: '5px 10px',
-              cursor: 'pointer',
-            }}
-          >
-            Justify
-          </button>
-          <button
-            onClick={copyToClipboard}
-            style={{
-              backgroundColor: '#f0f0f0',
-              border: 'none',
-              padding: '5px 10px',
-              cursor: 'pointer',
-            }}
-          >
-            Copy
-          </button>
-          <button
-            onClick={pasteFromClipboard}
-            style={{
-              backgroundColor: '#f0f0f0',
-              border: 'none',
-              padding: '5px 10px',
-              cursor: 'pointer',
-            }}
-          >
-            Paste
-          </button>
-        </div>
-      {/* )} */}
       <div
         ref={textRef}
         contentEditable
@@ -238,6 +123,109 @@ const TextEditor = () => {
         }}
       >
         Select text in this editable area to see formatting options.
+      </div>
+      <div
+        style={{
+          position: 'fixed',
+          top: '10px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          backgroundColor: 'white',
+          border: '1px solid #ccc',
+          padding: '5px',
+          display: 'flex',
+          gap: '5px',
+          zIndex: 1000,
+        }}
+      >
+        <button
+          onClick={() => applyStyle('font-weight: bold;')}
+          style={{
+            backgroundColor: '#f0f0f0',
+            border: 'none',
+            padding: '5px 10px',
+            cursor: 'pointer',
+          }}
+        >
+          Bold
+        </button>
+        <button
+          onClick={() => applyStyle('text-decoration: underline;')}
+          style={{
+            backgroundColor: '#f0f0f0',
+            border: 'none',
+            padding: '5px 10px',
+            cursor: 'pointer',
+          }}
+        >
+          Underline
+        </button>
+        <button
+          onClick={() => applyAlignment('left')}
+          style={{
+            backgroundColor: '#f0f0f0',
+            border: 'none',
+            padding: '5px 10px',
+            cursor: 'pointer',
+          }}
+        >
+          Left
+        </button>
+        <button
+          onClick={() => applyAlignment('center')}
+          style={{
+            backgroundColor: '#f0f0f0',
+            border: 'none',
+            padding: '5px 10px',
+            cursor: 'pointer',
+          }}
+        >
+          Center
+        </button>
+        <button
+          onClick={() => applyAlignment('right')}
+          style={{
+            backgroundColor: '#f0f0f0',
+            border: 'none',
+            padding: '5px 10px',
+            cursor: 'pointer',
+          }}
+        >
+          Right
+        </button>
+        <button
+          onClick={() => applyAlignment('justify')}
+          style={{
+            backgroundColor: '#f0f0f0',
+            border: 'none',
+            padding: '5px 10px',
+            cursor: 'pointer',
+          }}
+        >
+          Justify
+        </button>
+        <button
+          onClick={copyToClipboard}
+          style={{
+            backgroundColor: '#f0f0f0',
+            border: 'none',
+            padding: '5px 10px',
+            cursor: 'pointer',
+          }}
+        >
+          Copy
+        </button>
+        <button
+          onClick={pasteFromClipboard}
+          style={{
+            backgroundColor: '#f0f0f0',
+            border: 'none',
+            padding: '5px 10px',
+            cursor: 'pointer',
+          }}
+        >
+          Paste
+        </button>
       </div>
     </div>
   );
